@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vinaya's Chatbot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+  <div class="bg-white shadow-lg rounded-lg w-full max-w-md p-6">
+    <h2 class="text-2xl font-bold mb-4 text-center text-blue-700">Vinaya's Chatbot</h2>
+    
+    <div id="chat-box" class="h-64 overflow-y-auto border rounded p-4 mb-4 text-sm bg-gray-50"></div>
+
+    <input type="text" id="user-input" class="w-full border rounded px-3 py-2 mb-2" placeholder="Type your message..." />
+    <button onclick="sendMessage()" class="w-full bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600">Send</button>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const inputField = document.getElementById("user-input");
+      const message = inputField.value.trim();
+      if (!message) return;
+
+      const chatBox = document.getElementById("chat-box");
+      chatBox.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+      inputField.value = "";
+
+      try {
+        const response = await fetch("http://localhost:5000/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.json();
+        chatBox.innerHTML += `<div><strong>Bot:</strong> ${data.response}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        chatBox.innerHTML += `<div class="text-red-500"><strong>Error:</strong> Cannot connect to backend.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
